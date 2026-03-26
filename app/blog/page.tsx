@@ -1,25 +1,45 @@
-"use client";
-
-import { useState, useMemo } from "react";
-import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
+import { BlogContent } from "./blog-content";
 import { ArticleCard } from "@/components/article-card";
-import { CategoryFilter } from "@/components/category-filter";
-import { articles, categories } from "@/lib/data";
-import { Category } from "@/lib/types";
+import { articles } from "@/lib/data";
 
-export default function BlogPage() {
-  const searchParams = useSearchParams();
-  const initialCategory = searchParams.get("categoria") as Category | null;
-  
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
-    initialCategory && categories.includes(initialCategory) ? initialCategory : null
+// Loading skeleton for the blog page
+function BlogSkeleton() {
+  return (
+    <div className="container py-12">
+      {/* Header Skeleton */}
+      <div className="mb-12 text-center">
+        <div className="h-10 w-24 bg-muted animate-pulse rounded-lg mx-auto" />
+        <div className="mt-4 h-6 w-96 bg-muted animate-pulse rounded-lg mx-auto" />
+      </div>
+
+      {/* Category Filter Skeleton */}
+      <div className="mb-8 flex gap-2 justify-center">
+        {[1, 2, 3, 4, 5].map((i) => (
+          <div key={i} className="h-6 w-20 bg-muted animate-pulse rounded-full" />
+        ))}
+      </div>
+
+      {/* Articles Grid Skeleton */}
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {[1, 2, 3, 4, 5, 6].map((i) => (
+          <div key={i} className="rounded-xl border bg-card overflow-hidden">
+            <div className="aspect-video bg-muted animate-pulse" />
+            <div className="p-5 space-y-3">
+              <div className="h-4 w-20 bg-muted animate-pulse rounded" />
+              <div className="h-6 w-full bg-muted animate-pulse rounded" />
+              <div className="h-4 w-full bg-muted animate-pulse rounded" />
+              <div className="h-4 w-3/4 bg-muted animate-pulse rounded" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
   );
+}
 
-  const filteredArticles = useMemo(() => {
-    if (!selectedCategory) return articles;
-    return articles.filter((article) => article.category === selectedCategory);
-  }, [selectedCategory]);
-
+// Static content that doesn't use useSearchParams
+function StaticBlogContent() {
   return (
     <div className="container py-12">
       {/* Header */}
@@ -30,35 +50,14 @@ export default function BlogPage() {
         </p>
       </div>
 
-      {/* Category Filter */}
-      <div className="mb-8">
-        <CategoryFilter
-          categories={categories}
-          selectedCategory={selectedCategory}
-          onSelectCategory={setSelectedCategory}
-        />
-      </div>
-
-      {/* Articles Count */}
-      <p className="text-sm text-muted-foreground mb-6">
-        Mostrando {filteredArticles.length} artículo{filteredArticles.length !== 1 ? "s" : ""}
-        {selectedCategory && ` en ${selectedCategory}`}
-      </p>
-
-      {/* Articles Grid */}
-      {filteredArticles.length > 0 ? (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {filteredArticles.map((article) => (
-            <ArticleCard key={article.slug} article={article} />
-          ))}
-        </div>
-      ) : (
-        <div className="text-center py-12">
-          <p className="text-muted-foreground">
-            No hay artículos en esta categoría todavía.
-          </p>
-        </div>
-      )}
+      {/* Dynamic content with useSearchParams */}
+      <Suspense fallback={<BlogSkeleton />}>
+        <BlogContent />
+      </Suspense>
     </div>
   );
+}
+
+export default function BlogPage() {
+  return <StaticBlogContent />;
 }
