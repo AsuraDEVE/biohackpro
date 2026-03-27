@@ -1,6 +1,8 @@
 /** @type {import('next-sitemap').IConfig} */
 module.exports = {
-  siteUrl: process.env.SITE_URL || "https://biohackpro.com",
+  siteUrl: process.env.SITE_URL || process.env.VERCEL_URL 
+    ? `https://${process.env.VERCEL_URL}` 
+    : "https://biohackpro.vercel.app",
   generateRobotsTxt: true,
   generateIndexSitemap: false,
   robotsTxtOptions: {
