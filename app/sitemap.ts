@@ -1,10 +1,7 @@
 import { MetadataRoute } from 'next'
-import { articles } from '@/lib/data'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.VERCEL_URL 
-    ? `https://${process.env.VERCEL_URL}` 
-    : 'https://biohackpro.vercel.app'
+  const baseUrl = 'https://biohackpro.vercel.app'
 
   // Static pages
   const staticPages: MetadataRoute.Sitemap = [
@@ -28,9 +25,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ]
 
-  // Blog articles
-  const blogPages: MetadataRoute.Sitemap = articles.map((article) => ({
-    url: `${baseUrl}/blog/${article.slug}`,
+  // Blog articles - hardcoded for reliability
+  const blogSlugs = [
+    'guia-completa-melatonina',
+    'nootropicos-principiantes',
+    'ayuno-intermitente-guia',
+    'magnesio-beneficios',
+    'optimizar-sueno-ciencia',
+    'creatina-guia-completa',
+    'suplementos-energia',
+    'meditacion-transcendental'
+  ]
+
+  const blogPages: MetadataRoute.Sitemap = blogSlugs.map((slug) => ({
+    url: `${baseUrl}/blog/${slug}`,
     lastModified: new Date(),
     changeFrequency: 'weekly' as const,
     priority: 0.8,
